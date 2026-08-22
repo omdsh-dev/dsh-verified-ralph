@@ -1,0 +1,79 @@
+# dsh-verified-ralph
+
+[English](README.md) | 中文
+
+`dsh-verified-ralph` 是独立的 DeepSeek Harness function plugin，在官方 `ralph` 之外新增 `verified_ralph`。每个 Round 都启动共享工作区上的全新本地 child，将其不可变 DSH session 投影为可观察轨迹，再通过 `ctx.verifier` 独立评分任务完成进展。
+
+插件不修改 DSH core，也不重新定义 verifier API。它固定消费 `dsh-as-a-verifier` merge commit `d717bf90b77c031efc02ad9f344aa54edb631ccd`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+## 安装
+
+先安装 verifier provider，再安装本 consumer。两个仓库都保持 `private: true` npm package，通过 Git/profile 安装：
+
+```sh
+dsh plugin --profile web add github:omdsh-dev/dsh-as-a-verifier#d717bf90b77c031efc02ad9f344aa54edb631ccd
+dsh plugin --profile web add github:omdsh-dev/dsh-verified-ralph
+```
+
+Headless 使用对应 profile。Git prepare 首次安装时，应把 pnpm 报错提供的精确 package key 加入 `allowBuilds`。bundle 只插入 `dsh-verified-ralph`；verifier row 与凭据由部署单独管理。
+
+## 合同
+
+插件导出 `name`、`inject`、`Config`、`apply`，没有 default export；必需服务为 `tools`、`subagents`、`systemPrompt`、`verifier`。
+
+```ts
+await tools.verified_ralph({
+  objective: '实现需求并证明相关检查通过。',
+  maxRounds: 8,
+})
+```
+
+每个 child 只接收不可变 objective、Round 信息、共享工作区说明、上一轮有界 report 和可选的固定 verifier 纠偏。provider 必须支持 structured output、不得继承 parent context，并且必须返回 `localAgent`；禁止远程或 report-only 降级。
+
+child 成功结束后，插件按 `step/start`—`step/end` 聚合 assistant message、tool call 和 tool result，再调用 `ctx.verifier.track()` 评分最后一个完成 step。完整任务和投影后的 child 轨迹会发送到配置的 DeepSeek verifier endpoint。child session 保存普通 prompt/轨迹，parent 保存规范化最终工具结果；插件不增加自定义 session event。
+
+成功状态：
+
+- `verified-complete`：worker 报告完成且独立分数达到阈值。
+- `blocked`：worker 报告具体 blocker，`verified` 保持 false。
+- `stagnated`：完整纠偏宽限期后仍未取得足够进展。
+- `budget-limited`：达到部署或调用 Round 上限。
+
+child、session、report、verifier、取消或 provider 失败都会让整个工具失败。低于阈值的完成声明只会触发纠偏，绝不会被接受或静默视为平局。
+
+## 保守策略
+
+| 字段 | 默认值 | 含义 |
+| --- | --- | --- |
+| `subagentProvider` | `spawn` | 全新 structured 本地 provider |
+| `maxRounds` | `256` | 默认值与部署 ceiling |
+| `maxHandoffChars` | `16384` | worker report 序列化上限 |
+| `maxResultChars` | `16384` | parent 渲染文本上限，不改变 canonical data |
+| `nEvaluations` | `2` | 每 Round verifier repeats |
+| `completionThreshold` | `0.85` | 独立完成阈值 |
+| `stagnationWindow` | `3` | 停滞检测窗口 |
+| `minProgressGain` | `0.05` | 清除停滞/纠偏所需增益 |
+| `correctionGraceRounds` | `2` | 纠偏后的完整宽限 Round 数 |
+
+被拒绝的完成声明会立即触发纠偏；否则当完整窗口首尾增益低于 `minProgressGain` 时触发。后续分数达到纠偏前最佳值加 `minProgressGain` 会清除纠偏，否则在宽限 Round 后停止。
+
+canonical result 包含运行状态与计数、最终 report、每个 child id/分数/调用/usage/决策、聚合 usage、阈值、最终分数和 `verified`。
+
+## 开发
+
+```sh
+pnpm install
+pnpm run verify:self-contained
+pnpm run typecheck
+pnpm test
+pnpm run build
+pnpm run prepare
+```
+
+## 边界
+
+不修改 DSH core，不替换官方 `ralph`，不支持远程 provider 降级、多模态、后台/进程恢复 Ralph、价格/时间预算、UI 或其他 verifier backend。
+
+## 许可
+
+[MIT](LICENSE)。上游声明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
