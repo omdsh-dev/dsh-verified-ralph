@@ -15,7 +15,16 @@ dsh plugin --profile web add github:omdsh-dev/dsh-as-a-verifier#d717bf90b77c031e
 dsh plugin --profile web add github:omdsh-dev/dsh-verified-ralph
 ```
 
-Use the corresponding Headless profile commands when appropriate. Git prepare builds require the exact `allowBuilds` key printed by pnpm on first install. The bundle inserts only `dsh-verified-ralph`; deployment owns the separate verifier row and credentials.
+Use the corresponding Headless profile commands when appropriate. Because this Git package deliberately pins another Git package, pnpm 11 callers must opt into that audited dependency edge and both prepare builds:
+
+```yaml
+blockExoticSubdeps: false
+allowBuilds:
+  dsh-verified-ralph@https://codeload.github.com/omdsh-dev/dsh-verified-ralph/tar.gz/<verified-ralph-commit>: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d717bf90b77c031efc02ad9f344aa54edb631ccd: true
+```
+
+Replace `<verified-ralph-commit>` with the installed commit. The bundle inserts only `dsh-verified-ralph`; deployment owns the separate verifier row and credentials.
 
 ## Contract
 
