@@ -15,7 +15,16 @@ dsh plugin --profile web add github:omdsh-dev/dsh-as-a-verifier#d717bf90b77c031e
 dsh plugin --profile web add github:omdsh-dev/dsh-verified-ralph
 ```
 
-Headless 使用对应 profile。Git prepare 首次安装时，应把 pnpm 报错提供的精确 package key 加入 `allowBuilds`。bundle 只插入 `dsh-verified-ralph`；verifier row 与凭据由部署单独管理。
+Headless 使用对应 profile。由于本 Git package 有意固定依赖另一个 Git package，pnpm 11 调用方需要显式允许这条已审计的依赖边和两次 prepare 构建：
+
+```yaml
+blockExoticSubdeps: false
+allowBuilds:
+  dsh-verified-ralph@https://codeload.github.com/omdsh-dev/dsh-verified-ralph/tar.gz/<verified-ralph-commit>: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d717bf90b77c031efc02ad9f344aa54edb631ccd: true
+```
+
+将 `<verified-ralph-commit>` 替换为实际安装的 commit。bundle 只插入 `dsh-verified-ralph`；verifier row 与凭据由部署单独管理。
 
 ## 合同
 
