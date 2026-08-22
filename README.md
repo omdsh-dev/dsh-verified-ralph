@@ -4,14 +4,14 @@ English | [中文](README.zh.md)
 
 `dsh-verified-ralph` is a standalone DeepSeek Harness function plugin that adds `verified_ralph` alongside the official `ralph` tool. Every round starts a fresh local child over the shared workspace, projects its immutable DSH session into observable trajectory steps, and asks `ctx.verifier` for an independent completion-progress score.
 
-The plugin does not modify DSH core and does not redefine verifier APIs. It consumes `dsh-as-a-verifier` pinned at merge commit `d717bf90b77c031efc02ad9f344aa54edb631ccd`. Attribution is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The plugin does not modify DSH core and does not redefine verifier APIs. It consumes `dsh-as-a-verifier` pinned at merge commit `1bab923ea323d863d83f5b4fd47ce6bab42600fe`; the underlying progress method derives from llm-as-a-verifier (<https://github.com/llm-as-a-verifier/llm-as-a-verifier>) at commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`. Attribution is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Install
 
 Install the verifier provider first, then this consumer. Both repositories intentionally remain `private: true` npm packages and support Git/profile installation:
 
 ```sh
-dsh plugin --profile web add github:omdsh-dev/dsh-as-a-verifier#d717bf90b77c031efc02ad9f344aa54edb631ccd
+dsh plugin --profile web add github:omdsh-dev/dsh-as-a-verifier#1bab923ea323d863d83f5b4fd47ce6bab42600fe
 dsh plugin --profile web add github:omdsh-dev/dsh-verified-ralph
 ```
 
@@ -21,7 +21,7 @@ Use the corresponding Headless profile commands when appropriate. Because this G
 blockExoticSubdeps: false
 allowBuilds:
   dsh-verified-ralph@https://codeload.github.com/omdsh-dev/dsh-verified-ralph/tar.gz/<verified-ralph-commit>: true
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d717bf90b77c031efc02ad9f344aa54edb631ccd: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/1bab923ea323d863d83f5b4fd47ce6bab42600fe: true
 ```
 
 Replace `<verified-ralph-commit>` with the installed commit. The bundle inserts only `dsh-verified-ralph`; deployment owns the separate verifier row and credentials.

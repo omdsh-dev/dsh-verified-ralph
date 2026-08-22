@@ -4,14 +4,14 @@
 
 `dsh-verified-ralph` 是独立的 DeepSeek Harness function plugin，在官方 `ralph` 之外新增 `verified_ralph`。每个 Round 都启动共享工作区上的全新本地 child，将其不可变 DSH session 投影为可观察轨迹，再通过 `ctx.verifier` 独立评分任务完成进展。
 
-插件不修改 DSH core，也不重新定义 verifier API。它固定消费 `dsh-as-a-verifier` merge commit `d717bf90b77c031efc02ad9f344aa54edb631ccd`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+插件不修改 DSH core，也不重新定义 verifier API。它固定消费 `dsh-as-a-verifier` merge commit `1bab923ea323d863d83f5b4fd47ce6bab42600fe`；底层 progress 方法源自 llm-as-a-verifier（<https://github.com/llm-as-a-verifier/llm-as-a-verifier>）的 commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 
 先安装 verifier provider，再安装本 consumer。两个仓库都保持 `private: true` npm package，通过 Git/profile 安装：
 
 ```sh
-dsh plugin --profile web add github:omdsh-dev/dsh-as-a-verifier#d717bf90b77c031efc02ad9f344aa54edb631ccd
+dsh plugin --profile web add github:omdsh-dev/dsh-as-a-verifier#1bab923ea323d863d83f5b4fd47ce6bab42600fe
 dsh plugin --profile web add github:omdsh-dev/dsh-verified-ralph
 ```
 
@@ -21,7 +21,7 @@ Headless 使用对应 profile。由于本 Git package 有意固定依赖另一�
 blockExoticSubdeps: false
 allowBuilds:
   dsh-verified-ralph@https://codeload.github.com/omdsh-dev/dsh-verified-ralph/tar.gz/<verified-ralph-commit>: true
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d717bf90b77c031efc02ad9f344aa54edb631ccd: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/1bab923ea323d863d83f5b4fd47ce6bab42600fe: true
 ```
 
 将 `<verified-ralph-commit>` 替换为实际安装的 commit。bundle 只插入 `dsh-verified-ralph`；verifier row 与凭据由部署单独管理。

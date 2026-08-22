@@ -39,7 +39,7 @@ for (const required of ['src/index.ts', 'src/config.ts', 'src/runtime.ts', 'src/
 }
 const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 const verifierSpec = manifest.dependencies?.['dsh-as-a-verifier']
-if (verifierSpec !== 'git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#d717bf90b77c031efc02ad9f344aa54edb631ccd') {
+if (verifierSpec !== 'git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#1bab923ea323d863d83f5b4fd47ce6bab42600fe') {
   failures.push('dsh-as-a-verifier dependency is not pinned to the reviewed merge commit')
 }
 if (failures.length > 0) {
