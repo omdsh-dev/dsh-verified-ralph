@@ -4,7 +4,7 @@ packages:
 autoInstallPeers: false
 
 allowBuilds:
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d717bf90b77c031efc02ad9f344aa54edb631ccd: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/1bab923ea323d863d83f5b4fd47ce6bab42600fe: true
   esbuild: true
 
 minimumReleaseAgeExclude:

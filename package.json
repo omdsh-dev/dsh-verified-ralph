@@ -33,7 +33,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "dsh-as-a-verifier": "git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#d717bf90b77c031efc02ad9f344aa54edb631ccd"
+    "dsh-as-a-verifier": "git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#1bab923ea323d863d83f5b4fd47ce6bab42600fe"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.1-rc.1 <5.0.0",

@@ -4,9 +4,9 @@
 
 Upstream project: `llm-as-a-verifier`
 
-Upstream source: `https://github.com/llm-as-a-verifier/llm-as-a-verifier`
+Upstream source: <https://github.com/llm-as-a-verifier/llm-as-a-verifier>
 
-Pinned revision: `115de305f23ed89bc42e86e010853c40059f3f7d`
+Pinned revision: `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`
 
 This plugin consumes the native TypeScript progress implementation in `dsh-as-a-verifier`, which derives its A–T progress prompt and logprob decoder from that revision.
 
