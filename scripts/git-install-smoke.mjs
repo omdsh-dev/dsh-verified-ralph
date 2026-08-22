@@ -92,7 +92,8 @@ try {
   }
   if ('default' in plugin) throw new Error('installed package unexpectedly has a default export')
 
-  const providerEntry = require.resolve(PROVIDER_NAME)
+  const consumerRequire = createRequire(join(installedRoot, 'provider-smoke.cjs'))
+  const providerEntry = consumerRequire.resolve(PROVIDER_NAME)
   const providerRoot = dirname(dirname(providerEntry))
   const providerManifest = JSON.parse(readFileSync(join(providerRoot, 'package.json'), 'utf8'))
   if (providerManifest.version !== '0.2.3') throw new Error(`installed provider version ${providerManifest.version} is not 0.2.3`)
