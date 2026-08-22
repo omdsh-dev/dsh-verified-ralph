@@ -4,7 +4,18 @@ import type { ToolDefinition } from '@deepseek-ai/dsh-tools'
 import { describe, expect, it } from 'vitest'
 import * as plugin from '../src/index.ts'
 
-async function mount() {
+const compatibleVerifier = {
+  protocolVersion: 1,
+  capabilities: {
+    pairwiseComparison: true,
+    candidateSelection: true,
+    offlineProgressTracking: true,
+    onlineProgressTracking: true,
+  },
+  track: async () => { throw new Error('not used') },
+}
+
+async function mount(verifier: unknown = compatibleVerifier) {
   const ctx = new Context()
   const tools: ToolDefinition[] = [{ name: 'ralph' } as ToolDefinition]
   const sections: { name: string, text: string }[] = []
@@ -15,7 +26,7 @@ async function mount() {
     },
   })
   ctx.provide('subagents', { getProvider: () => undefined, start: async () => { throw new Error('not used') } } as never)
-  ctx.provide('verifier', { track: async () => { throw new Error('not used') } } as never)
+  ctx.provide('verifier', verifier as never)
   ctx.provide('systemPrompt', {
     section(section: { name: string, text: string }) {
       sections.push(section)
@@ -45,5 +56,13 @@ describe('dsh-verified-ralph plugin', () => {
     await test.fiber.dispose()
     expect(test.tools.map(tool => tool.name)).toEqual(['ralph'])
     expect(test.sections).toEqual([])
+  })
+
+  it('rejects incompatible verifier protocol and capabilities before registering', async () => {
+    await expect(mount({ ...compatibleVerifier, protocolVersion: 0 })).rejects.toThrow('requires ctx.verifier protocol 1')
+    await expect(mount({
+      ...compatibleVerifier,
+      capabilities: { ...compatibleVerifier.capabilities, offlineProgressTracking: false },
+    })).rejects.toThrow('requires ctx.verifier capability offlineProgressTracking')
   })
 })

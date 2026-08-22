@@ -25,7 +25,16 @@ const Services = {
       schemas: () => tools,
     })
     ctx.provide('subagents', { getProvider: () => undefined } as never)
-    ctx.provide('verifier', { track: async () => { throw new Error('not used') } } as never)
+    ctx.provide('verifier', {
+      protocolVersion: 1,
+      capabilities: {
+        pairwiseComparison: true,
+        candidateSelection: true,
+        offlineProgressTracking: true,
+        onlineProgressTracking: true,
+      },
+      track: async () => { throw new Error('not used') },
+    } as never)
     ctx.provide('systemPrompt', { section: () => () => {} } as never)
   },
 }

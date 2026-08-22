@@ -4,12 +4,22 @@ import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-agent'
 import type {} from '@deepseek-ai/dsh-subagent'
 import type {} from '@deepseek-ai/dsh-system-prompt'
-import type {} from 'dsh-as-a-verifier'
+import { VERIFIER_PROTOCOL_VERSION, type VerifierServiceApi } from 'dsh-as-a-verifier'
 import { resolveConfig, type Config } from './config.ts'
 import { registerVerifiedRalphTool } from './tools.ts'
 
+export function assertVerifierCompatibility(verifier: VerifierServiceApi): void {
+  if (verifier.protocolVersion !== VERIFIER_PROTOCOL_VERSION) {
+    throw new Error(`dsh-verified-ralph requires ctx.verifier protocol ${VERIFIER_PROTOCOL_VERSION}; received ${String(verifier.protocolVersion)}`)
+  }
+  if (verifier.capabilities?.offlineProgressTracking !== true) {
+    throw new Error('dsh-verified-ralph requires ctx.verifier capability offlineProgressTracking')
+  }
+}
+
 export function apply(ctx: Context, config: Config): void {
   const resolved = resolveConfig(config)
+  assertVerifierCompatibility(ctx.verifier)
   const unregisterGuidance = ctx.systemPrompt.section({
     name: 'tool:verified-ralph',
     order: 117,

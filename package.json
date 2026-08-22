@@ -1,7 +1,7 @@
 {
   "name": "dsh-verified-ralph",
   "description": "Verifier-gated fresh-agent Ralph workflow plugin for DeepSeek Harness",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.7.0",
@@ -33,7 +33,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "dsh-as-a-verifier": "git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#1bab923ea323d863d83f5b4fd47ce6bab42600fe"
+    "dsh-as-a-verifier": "git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#64de9ff1c3b0000eff7a2efd47580403e8ea7ad2"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.1-rc.1 <5.0.0",

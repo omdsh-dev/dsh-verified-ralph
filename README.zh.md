@@ -4,15 +4,30 @@
 
 `dsh-verified-ralph` 是独立的 DeepSeek Harness function plugin，在官方 `ralph` 之外新增 `verified_ralph`。每个 Round 都启动共享工作区上的全新本地 child，将其不可变 DSH session 投影为可观察轨迹，再通过 `ctx.verifier` 独立评分任务完成进展。
 
-插件不修改 DSH core，也不重新定义 verifier API。它固定消费 `dsh-as-a-verifier` merge commit `1bab923ea323d863d83f5b4fd47ce6bab42600fe`；底层 progress 方法源自 llm-as-a-verifier（<https://github.com/llm-as-a-verifier/llm-as-a-verifier>）的 commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+插件不修改 DSH core，也不重新定义 verifier API。可复现构建依赖固定到 `dsh-as-a-verifier` merge commit `64de9ff1c3b0000eff7a2efd47580403e8ea7ad2`；运行时要求 verifier protocol 1 与离线 progress tracking。底层 progress 方法源自 llm-as-a-verifier（<https://github.com/llm-as-a-verifier/llm-as-a-verifier>）的 commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 
-先安装 verifier provider，再安装本 consumer。两个仓库都保持 `private: true` npm package，通过 Git/profile 安装：
+一起安装两个 bundle 默认分支的最新版本。两个仓库都保持 `private: true` npm package，通过 Git/profile 安装：
 
 ```sh
-dsh plugin --profile web add github:omdsh-dev/dsh-as-a-verifier#1bab923ea323d863d83f5b4fd47ce6bab42600fe
-dsh plugin --profile web add github:omdsh-dev/dsh-verified-ralph
+dsh plugin --profile web add \
+  github:omdsh-dev/dsh-as-a-verifier \
+  github:omdsh-dev/dsh-verified-ralph
+```
+
+Profile lockfile 会固定安装时解析到的 commit，重启不会静默追踪新提交。升级需要显式执行，并在完成后重启 Profile：
+
+```sh
+dsh plugin --profile web update dsh-as-a-verifier dsh-verified-ralph
+```
+
+需要稳定复现的生产部署应固定不可移动的 release tag：
+
+```sh
+dsh plugin --profile web add \
+  github:omdsh-dev/dsh-as-a-verifier#v0.2.1 \
+  github:omdsh-dev/dsh-verified-ralph#v0.1.1
 ```
 
 Headless 使用对应 profile。由于本 Git package 有意固定依赖另一个 Git package，pnpm 11 调用方需要显式允许这条已审计的依赖边和两次 prepare 构建：
@@ -21,14 +36,14 @@ Headless 使用对应 profile。由于本 Git package 有意固定依赖另一�
 blockExoticSubdeps: false
 allowBuilds:
   dsh-verified-ralph@https://codeload.github.com/omdsh-dev/dsh-verified-ralph/tar.gz/<verified-ralph-commit>: true
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/1bab923ea323d863d83f5b4fd47ce6bab42600fe: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/64de9ff1c3b0000eff7a2efd47580403e8ea7ad2: true
 ```
 
-将 `<verified-ralph-commit>` 替换为实际安装的 commit。bundle 只插入 `dsh-verified-ralph`；verifier row 与凭据由部署单独管理。
+将 `<verified-ralph-commit>` 替换为实际安装的 commit；跟随更新后的默认分支时，始终复制 pnpm 当前打印的精确 key。Release tag 只从验证完成的 `main` merge 创建且绝不移动；兼容修复提升 patch，公共编排能力提升 minor，不兼容的 verifier protocol 要求提升 major。bundle 只插入 `dsh-verified-ralph`；verifier row 与凭据由部署单独管理。
 
 ## 合同
 
-插件导出 `name`、`inject`、`Config`、`apply`，没有 default export；必需服务为 `tools`、`subagents`、`systemPrompt`、`verifier`。
+插件导出 `name`、`inject`、`Config`、`apply`，没有 default export；必需服务为 `tools`、`subagents`、`systemPrompt`、`verifier`。除非 `ctx.verifier.protocolVersion === 1` 且提供 `offlineProgressTracking`，插件会在注册 guidance 和工具前直接拒绝加载。
 
 ```ts
 await tools.verified_ralph({
