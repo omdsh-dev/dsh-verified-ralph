@@ -1,0 +1,7 @@
+# Bundle patch applied over a selected DSH Web or Headless profile.
+- insert:
+    - id: dsh-verified-ralph
+      name: dsh-verified-ralph
+
+# The provider row is installed separately so deployment controls its backend
+# configuration. No invariant row is needed for this event-free consumer.
