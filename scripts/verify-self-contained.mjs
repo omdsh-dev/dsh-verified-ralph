@@ -34,12 +34,23 @@ for (const file of files) {
     }
   }
 }
-for (const required of ['src/index.ts', 'src/config.ts', 'src/runtime.ts', 'src/invariant.ts', 'docs/dsh-plugin-contracts.md', 'tests/plugin.spec.ts']) {
+for (const required of [
+  '.github/workflows/ci.yml',
+  '.github/workflows/release-check.yml',
+  'src/index.ts',
+  'src/config.ts',
+  'src/runtime.ts',
+  'src/invariant.ts',
+  'docs/dsh-plugin-contracts.md',
+  'scripts/git-install-smoke.mjs',
+  'scripts/verify-release.mjs',
+  'tests/plugin.spec.ts',
+]) {
   if (!existsSync(join(root, required))) failures.push(`missing ${required}`)
 }
 const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
 const verifierSpec = manifest.dependencies?.['dsh-as-a-verifier']
-if (verifierSpec !== 'git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#64de9ff1c3b0000eff7a2efd47580403e8ea7ad2') {
+if (verifierSpec !== 'git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#0d57987a409f15ecb47864cc811e944504d99091') {
   failures.push('dsh-as-a-verifier dependency is not pinned to the reviewed merge commit')
 }
 if (failures.length > 0) {

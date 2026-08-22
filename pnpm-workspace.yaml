@@ -2,9 +2,11 @@ packages:
   - .
 
 autoInstallPeers: false
+blockExoticSubdeps: false
 
 allowBuilds:
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/64de9ff1c3b0000eff7a2efd47580403e8ea7ad2: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/0d57987a409f15ecb47864cc811e944504d99091: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/64de9ff1c3b0000eff7a2efd47580403e8ea7ad2: set this to true or false
   esbuild: true
 
 minimumReleaseAgeExclude:

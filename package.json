@@ -1,7 +1,7 @@
 {
   "name": "dsh-verified-ralph",
   "description": "Verifier-gated fresh-agent Ralph workflow plugin for DeepSeek Harness",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.7.0",
@@ -11,11 +11,13 @@
     "url": "git+https://github.com/omdsh-dev/dsh-verified-ralph.git"
   },
   "scripts": {
-    "build": "tsc -b && tsdown",
+    "build": "tsc -b && tsdown --config tsdown.config.mjs",
     "test": "vitest run",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.vitest.json --pretty false",
     "verify:self-contained": "node scripts/verify-self-contained.mjs",
+    "smoke:git": "node scripts/git-install-smoke.mjs",
+    "verify:release": "node scripts/verify-release.mjs",
     "prepare": "node scripts/prepare.mjs",
     "prepack": "pnpm run typecheck && pnpm test && pnpm run build"
   },
@@ -33,7 +35,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "dsh-as-a-verifier": "git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#64de9ff1c3b0000eff7a2efd47580403e8ea7ad2"
+    "dsh-as-a-verifier": "git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#0d57987a409f15ecb47864cc811e944504d99091"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.1-rc.1 <5.0.0",

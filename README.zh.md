@@ -4,7 +4,7 @@
 
 `dsh-verified-ralph` 是独立的 DeepSeek Harness function plugin，在官方 `ralph` 之外新增 `verified_ralph`。每个 Round 都启动共享工作区上的全新本地 child，将其不可变 DSH session 投影为可观察轨迹，再通过 `ctx.verifier` 独立评分任务完成进展。
 
-插件不修改 DSH core，也不重新定义 verifier API。可复现构建依赖固定到 `dsh-as-a-verifier` merge commit `64de9ff1c3b0000eff7a2efd47580403e8ea7ad2`；运行时要求 verifier protocol 1 与离线 progress tracking。底层 progress 方法源自 llm-as-a-verifier（<https://github.com/llm-as-a-verifier/llm-as-a-verifier>）的 commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+插件不修改 DSH core，也不重新定义 verifier API。可复现构建依赖固定到 `dsh-as-a-verifier` merge commit `0d57987a409f15ecb47864cc811e944504d99091`（release `v0.2.3`）；运行时要求 verifier protocol 1 与离线 progress tracking。底层 progress 方法源自 llm-as-a-verifier（<https://github.com/llm-as-a-verifier/llm-as-a-verifier>）的 commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 
@@ -26,8 +26,8 @@ dsh plugin --profile web update dsh-as-a-verifier dsh-verified-ralph
 
 ```sh
 dsh plugin --profile web add \
-  github:omdsh-dev/dsh-as-a-verifier#v0.2.1 \
-  github:omdsh-dev/dsh-verified-ralph#v0.1.1
+  github:omdsh-dev/dsh-as-a-verifier#v0.2.3 \
+  github:omdsh-dev/dsh-verified-ralph#v0.1.2
 ```
 
 Headless 使用对应 profile。由于本 Git package 有意固定依赖另一个 Git package，pnpm 11 调用方需要显式允许这条已审计的依赖边和两次 prepare 构建：
@@ -36,7 +36,7 @@ Headless 使用对应 profile。由于本 Git package 有意固定依赖另一�
 blockExoticSubdeps: false
 allowBuilds:
   dsh-verified-ralph@https://codeload.github.com/omdsh-dev/dsh-verified-ralph/tar.gz/<verified-ralph-commit>: true
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/64de9ff1c3b0000eff7a2efd47580403e8ea7ad2: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/0d57987a409f15ecb47864cc811e944504d99091: true
 ```
 
 将 `<verified-ralph-commit>` 替换为实际安装的 commit；跟随更新后的默认分支时，始终复制 pnpm 当前打印的精确 key。Release tag 只从验证完成的 `main` merge 创建且绝不移动；兼容修复提升 patch，公共编排能力提升 minor，不兼容的 verifier protocol 要求提升 major。bundle 只插入 `dsh-verified-ralph`；verifier row 与凭据由部署单独管理。
@@ -93,6 +93,10 @@ pnpm test
 pnpm run build
 pnpm run prepare
 ```
+
+所有 PR 与 `main` push 都会运行 Ubuntu/Windows × Node 22/24 完整矩阵和精确 commit Git-install smoke。所有 Action 使用审查过的完整 SHA，并采用 Node 24 action runtime；CI 不读取 DeepSeek key，也不调用真实 API。稳定的 `required` check 是 `main` 门禁。
+
+发布保持人工流程：维护者先对当前 `main` 精确 SHA 与版本手工触发 `release-check`，等待所有 keyless 门禁和 Git 安装通过，再通过 Hangar/devbox-x 创建并推送 annotated tag；tag 会再次触发同一个只读检查。Actions 不创建或移动 tag，也不发布 npm。只有 backend、prompt 或 decoder 行为变化时，才要求在本地执行真实 API E2E。
 
 ## 边界
 

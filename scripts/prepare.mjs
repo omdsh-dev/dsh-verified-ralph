@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url)
 const packageFile = (name, relative) => join(dirname(require.resolve(`${name}/package.json`)), relative)
 const steps = [
   ['tsc', packageFile('typescript', 'bin/tsc'), ['-p', 'tsconfig.prepare.dts.json']],
-  ['tsdown', packageFile('tsdown', 'dist/run.mjs'), ['--config', 'tsdown.prepare.config.ts']],
+  ['tsdown', packageFile('tsdown', 'dist/run.mjs'), ['--config', 'tsdown.prepare.config.mjs']],
 ]
 rmSync(join(root, 'lib'), { recursive: true, force: true })
 for (const [name, entry, args] of steps) {
