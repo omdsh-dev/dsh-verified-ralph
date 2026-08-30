@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       dsh-as-a-verifier:
-        specifier: git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#0d57987a409f15ecb47864cc811e944504d99091
-        version: https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/0d57987a409f15ecb47864cc811e944504d99091(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-atomic-write@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-credentials@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-brand@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-home-paths@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-launch-environment@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-session@0.1.1-rc.2(a4e4bb24a1f3580ac25e11cfa3c6b8cc))(@deepseek-ai/dsh-tools@0.1.1-rc.2(119bc70f73f8eddebfaa6b47561adeb3))(@deepseek-ai/schemastery@3.18.1)
+        specifier: git+https://github.com/omdsh-dev/dsh-as-a-verifier.git#d74f80deb2de5b71004c4e81ed7c094eda663de0
+        version: https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d74f80deb2de5b71004c4e81ed7c094eda663de0(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-atomic-write@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-credentials@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-brand@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-home-paths@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-launch-environment@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-session@0.1.1-rc.2(a4e4bb24a1f3580ac25e11cfa3c6b8cc))(@deepseek-ai/dsh-tools@0.1.1-rc.2(119bc70f73f8eddebfaa6b47561adeb3))(@deepseek-ai/schemastery@3.18.1)
     devDependencies:
       '@deepseek-ai/cordis':
         specifier: 4.0.1
@@ -81,6 +81,9 @@ importers:
       '@types/node':
         specifier: 22.20.0
         version: 22.20.0
+      semver:
+        specifier: 7.8.5
+        version: 7.8.5
       tsdown:
         specifier: 0.22.2
         version: 0.22.2(typescript@6.0.3)
@@ -641,18 +644,18 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/0d57987a409f15ecb47864cc811e944504d99091:
-    resolution: {gitHosted: true, integrity: sha512-FQ++AYWJXgQLqJUx7LbUhsabXpohpvqmHnbvBBgSSDSTw8dkgyMv7RNRCt9MCf/uU+uG0beJtbE6kzZJ47Iz6g==, tarball: https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/0d57987a409f15ecb47864cc811e944504d99091}
-    version: 0.2.3
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d74f80deb2de5b71004c4e81ed7c094eda663de0:
+    resolution: {gitHosted: true, integrity: sha512-16poDhgXY8GLQUHU6Yup7jj3srLf8lPPH6V7R5BAix+ESEosbPJndGHeDVEVzo4WuKkkDAcL/Ym/YZPjgn28Hw==, tarball: https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d74f80deb2de5b71004c4e81ed7c094eda663de0}
+    version: 0.2.4
     engines: {node: ^22.19.0 || >=24.0.0}
     peerDependencies:
       '@deepseek-ai/cordis': '>=4.0.1-rc.1 <5.0.0'
-      '@deepseek-ai/dsh-atomic-write': '>=0.1.1-rc.2 <0.2.0'
-      '@deepseek-ai/dsh-credentials': '>=0.1.1-rc.2 <0.2.0'
-      '@deepseek-ai/dsh-home-paths': '>=0.1.1-rc.2 <0.2.0'
-      '@deepseek-ai/dsh-launch-environment': '>=0.1.1-rc.2 <0.2.0'
-      '@deepseek-ai/dsh-session': '>=0.1.1-rc.2 <0.2.0'
-      '@deepseek-ai/dsh-tools': '>=0.1.1-rc.2 <0.2.0'
+      '@deepseek-ai/dsh-atomic-write': '>=0.1.1-rc.2 <0.2.0 || >=0.1.2-alpha.1 <0.1.2'
+      '@deepseek-ai/dsh-credentials': '>=0.1.1-rc.2 <0.2.0 || >=0.1.2-alpha.1 <0.1.2'
+      '@deepseek-ai/dsh-home-paths': '>=0.1.1-rc.2 <0.2.0 || >=0.1.2-alpha.1 <0.1.2'
+      '@deepseek-ai/dsh-launch-environment': '>=0.1.1-rc.2 <0.2.0 || >=0.1.2-alpha.1 <0.1.2'
+      '@deepseek-ai/dsh-session': '>=0.1.1-rc.2 <0.2.0 || >=0.1.2-alpha.1 <0.1.2'
+      '@deepseek-ai/dsh-tools': '>=0.1.1-rc.2 <0.2.0 || >=0.1.2-alpha.1 <0.1.2'
       '@deepseek-ai/schemastery': '>=3.18.1-rc.1 <4.0.0'
     peerDependenciesMeta:
       '@deepseek-ai/cordis':
@@ -1457,7 +1460,7 @@ snapshots:
 
   detect-libc@2.1.2: {}
 
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/0d57987a409f15ecb47864cc811e944504d99091(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-atomic-write@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-credentials@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-brand@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-home-paths@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-launch-environment@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-session@0.1.1-rc.2(a4e4bb24a1f3580ac25e11cfa3c6b8cc))(@deepseek-ai/dsh-tools@0.1.1-rc.2(119bc70f73f8eddebfaa6b47561adeb3))(@deepseek-ai/schemastery@3.18.1):
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d74f80deb2de5b71004c4e81ed7c094eda663de0(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-atomic-write@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-credentials@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-brand@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-home-paths@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-launch-environment@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)))(@deepseek-ai/dsh-session@0.1.1-rc.2(a4e4bb24a1f3580ac25e11cfa3c6b8cc))(@deepseek-ai/dsh-tools@0.1.1-rc.2(119bc70f73f8eddebfaa6b47561adeb3))(@deepseek-ai/schemastery@3.18.1):
     optionalDependencies:
       '@deepseek-ai/cordis': 4.0.1(@deepseek-ai/cordis-plugin-include@1.0.6)(@deepseek-ai/cordis-plugin-loader@1.0.2)
       '@deepseek-ai/dsh-atomic-write': 0.1.1-rc.2(@deepseek-ai/cordis@4.0.1)(@deepseek-ai/dsh-invariants@0.1.1-rc.2(@deepseek-ai/cordis@4.0.1))
