@@ -27,7 +27,7 @@ For a reproducible stable deployment, pin immutable release tags:
 ```sh
 dsh plugin --profile web add \
   github:omdsh-dev/dsh-as-a-verifier#v0.2.4 \
-  github:omdsh-dev/dsh-verified-ralph#v0.1.3
+  github:omdsh-dev/dsh-verified-ralph#v0.1.4
 ```
 
 Use the corresponding Headless profile commands when appropriate. Because this Git package deliberately pins another Git package, pnpm 11 callers must opt into that audited dependency edge and both prepare builds:

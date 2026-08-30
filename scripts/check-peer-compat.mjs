@@ -22,7 +22,10 @@ for (const name of DSH_PEERS) {
   assert.equal(semver.satisfies('0.2.0', range), false, `${name} must not silently accept the next minor contract`)
 }
 
+for (const name of Object.keys(pkg.peerDependencies ?? {})) {
+  assert.equal(pkg.peerDependenciesMeta?.[name]?.optional, true, `${name} must be optional because DSH profiles supply runtime peers through module fallback`)
+}
+
 assert.equal(semver.satisfies('22.19.0', pkg.engines.node), true, 'Node 22.19.0 must remain the minimum compatibility target')
 assert.equal(semver.satisfies('24.0.0', pkg.engines.node), true, 'Node 24 must be supported')
 assert.equal(semver.satisfies('22.18.0', pkg.engines.node), false, 'Node releases below 22.19.0 must be rejected')
-

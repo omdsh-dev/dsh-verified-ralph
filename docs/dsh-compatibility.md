@@ -1,6 +1,6 @@
 # DSH and verifier compatibility baseline
 
-`dsh-verified-ralph` 0.1.3 was audited against DeepSeek Harness
+`dsh-verified-ralph` 0.1.4 was audited against DeepSeek Harness
 `dsh-v0.1.2-alpha.1` at commit
 `cd5ef8148158c3a752a658978873241fdf8e2bbc`, and against
 `dsh-as-a-verifier` 0.2.4 at merge commit
@@ -25,3 +25,8 @@ DSH `0.1.2-alpha.1` packages were not available from the npm registry at the
 time of this audit. Development dependencies remain on the latest published
 `0.1.1-rc.2` packages, peer ranges explicitly accept the audited alpha, and a
 read-only source-contract CI job guards the exact DSH release source.
+
+All Harness-facing peers are optional in the package manifest. DSH profiles
+supply them through the runtime module fallback rather than installing a second
+copy into each profile, so a clean profile installation must also pass
+`pnpm peers check` without manufacturing duplicate runtime dependencies.
