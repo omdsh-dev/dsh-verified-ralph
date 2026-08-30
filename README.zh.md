@@ -27,7 +27,7 @@ dsh plugin --profile web update dsh-as-a-verifier dsh-verified-ralph
 ```sh
 dsh plugin --profile web add \
   github:omdsh-dev/dsh-as-a-verifier#v0.2.4 \
-  github:omdsh-dev/dsh-verified-ralph#v0.1.3
+  github:omdsh-dev/dsh-verified-ralph#v0.1.4
 ```
 
 Headless 使用对应 profile。由于本 Git package 有意固定依赖另一个 Git package，pnpm 11 调用方需要显式允许这条已审计的依赖边和两次 prepare 构建：
