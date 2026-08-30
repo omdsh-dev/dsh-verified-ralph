@@ -4,7 +4,7 @@ English | [中文](README.zh.md)
 
 `dsh-verified-ralph` is a standalone DeepSeek Harness function plugin that adds `verified_ralph` alongside the official `ralph` tool. Every round starts a fresh local child over the shared workspace, projects its immutable DSH session into observable trajectory steps, and asks `ctx.verifier` for an independent completion-progress score.
 
-The plugin does not modify DSH core and does not redefine verifier APIs. Its reproducible build dependency pins `dsh-as-a-verifier` merge commit `0d57987a409f15ecb47864cc811e944504d99091` (release `v0.2.3`); at runtime it requires verifier protocol 1 with offline progress tracking. The underlying progress method derives from llm-as-a-verifier (<https://github.com/llm-as-a-verifier/llm-as-a-verifier>) at commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`. Attribution is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The plugin does not modify DSH core and does not redefine verifier APIs. Its reproducible build dependency pins `dsh-as-a-verifier` merge commit `d74f80deb2de5b71004c4e81ed7c094eda663de0` (release `v0.2.4`); at runtime it requires verifier protocol 1 with offline progress tracking. The underlying progress method derives from llm-as-a-verifier (<https://github.com/llm-as-a-verifier/llm-as-a-verifier>) at commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`. Attribution is in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Install
 
@@ -26,8 +26,8 @@ For a reproducible stable deployment, pin immutable release tags:
 
 ```sh
 dsh plugin --profile web add \
-  github:omdsh-dev/dsh-as-a-verifier#v0.2.3 \
-  github:omdsh-dev/dsh-verified-ralph#v0.1.2
+  github:omdsh-dev/dsh-as-a-verifier#v0.2.4 \
+  github:omdsh-dev/dsh-verified-ralph#v0.1.3
 ```
 
 Use the corresponding Headless profile commands when appropriate. Because this Git package deliberately pins another Git package, pnpm 11 callers must opt into that audited dependency edge and both prepare builds:
@@ -36,7 +36,7 @@ Use the corresponding Headless profile commands when appropriate. Because this G
 blockExoticSubdeps: false
 allowBuilds:
   dsh-verified-ralph@https://codeload.github.com/omdsh-dev/dsh-verified-ralph/tar.gz/<verified-ralph-commit>: true
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/0d57987a409f15ecb47864cc811e944504d99091: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/d74f80deb2de5b71004c4e81ed7c094eda663de0: true
 ```
 
 Replace `<verified-ralph-commit>` with the installed commit, and always copy the exact current keys printed by pnpm when following a newer default branch. Release tags are created only from validated `main` merges and are never moved. Compatible fixes increment patch; public orchestration additions increment minor; an incompatible required verifier protocol increments major. The bundle inserts only `dsh-verified-ralph`; deployment owns the separate verifier row and credentials.
@@ -94,9 +94,9 @@ pnpm run build
 pnpm run prepare
 ```
 
-Pull requests and `main` pushes run the complete Ubuntu/Windows × Node 22/24 matrix plus an exact-commit Git-install smoke. All actions use reviewed full-SHA pins and Node 24 action runtimes; CI does not read a DeepSeek key or call the real API. The stable `required` check is the branch-protection gate.
+Pull requests and `main` pushes run the complete Ubuntu/Windows matrix on Node 24 and the exact minimum Node 22.19.0, plus an exact-commit Git-install smoke on Node 24. A source-contract gate pins the audited DSH `dsh-v0.1.2-alpha.1` release (`cd5ef8148158c3a752a658978873241fdf8e2bbc`) and verifies the one-shot subagent and SessionEvent seams used by the verifier-gated flow. All actions use reviewed full-SHA pins and Node 24 action runtimes; CI does not read a DeepSeek key or call the real API. The stable `required` check is the branch-protection gate.
 
-Releases remain manual. A maintainer first dispatches `release-check` for the exact current `main` SHA and version, waits for all keyless gates and Git installation to pass, then creates and pushes an annotated tag through the Hangar/devbox-x path. The tag triggers the same read-only check again. Tags are never created, moved, or published to npm by Actions. Local real-API E2E is required only when backend, prompt, or decoder behavior changes.
+Releases remain manual. A maintainer first dispatches `release-check` for the exact current `main` SHA and version, waits for all keyless gates and Git installation to pass, then creates an annotated tag. The tag triggers the same read-only check again; after it is green, publish a non-draft, non-prerelease GitHub Release for the immutable tag. Tags are never created or moved by Actions, and npm is not used as a release channel. Local real-API E2E is required only when backend, prompt, or decoder behavior changes.
 
 ## Boundaries
 
