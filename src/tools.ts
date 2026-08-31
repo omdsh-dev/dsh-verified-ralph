@@ -2,7 +2,7 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import type { ContentBlock } from '@deepseek-ai/dsh-llm'
-import type { JsonValue } from '@deepseek-ai/dsh-session'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { ResolvedConfig } from './config.ts'
 import { runVerifiedRalph } from './runner.ts'
@@ -23,17 +23,21 @@ function render(result: VerifiedRalphResult, maximum: number): string {
       ? 'a worker-reported blocker'
       : result.status === 'stagnated'
         ? 'verifier-detected stagnation'
-        : 'the round budget'
+        : `the ${result.budget.exhausted ?? 'deployment'} budget`
   return bound(`Verified Ralph ended after ${result.roundsStarted} rounds with ${label}.\n${JSON.stringify(result, null, 2)}`, maximum)
 }
 
 export function registerVerifiedRalphTool(ctx: Context, config: ResolvedConfig): void {
   const unregister = ctx.tools.register(defineTool({
     name: 'verified_ralph',
-    description: 'Run fresh local Ralph workers toward one immutable objective, independently score each child session, reject unverified completion, issue bounded correction, and stop persistent stagnation.',
+    description: 'Run fresh local Ralph workers toward one immutable objective, independently score each child session, reject unverified completion, issue bounded correction, and enforce deployment-owned round, verifier, child-token, and wall-time budgets.',
     parameters: {
       objective: { type: 'string', required: true, description: 'The immutable objective for every fresh verified Ralph round.' },
       maxRounds: { type: 'integer', description: 'Optional round cap bounded by deployment policy.' },
+      maxVerifierCalls: { type: 'integer', description: 'Optional verifier-call cap bounded by deployment policy.' },
+      maxVerifierTokens: { type: 'integer', description: 'Optional metered verifier-token cap bounded by deployment policy.' },
+      maxWallTimeMs: { type: 'integer', description: 'Optional wall-clock cap in milliseconds bounded by deployment policy.' },
+      maxChildTokens: { type: 'integer', description: 'Optional per-child-request output-token cap bounded by deployment policy.' },
     },
     output: {
       schema: {
@@ -48,6 +52,7 @@ export function registerVerifiedRalphTool(ctx: Context, config: ResolvedConfig):
           progress: { type: 'json', required: true },
           usage: { type: 'json', required: true },
           verification: { type: 'json', required: true },
+          budget: { type: 'json', required: true },
         },
       },
       render: (_args, value) => [{ type: 'text', text: render(value as unknown as VerifiedRalphResult, config.maxResultChars) }],
@@ -63,6 +68,7 @@ export function registerVerifiedRalphTool(ctx: Context, config: ResolvedConfig):
         progress: result.progress as unknown as JsonValue,
         usage: result.usage as unknown as JsonValue,
         verification: result.verification as unknown as JsonValue,
+        budget: result.budget as unknown as JsonValue,
       }
     },
   }))

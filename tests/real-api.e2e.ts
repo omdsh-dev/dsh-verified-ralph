@@ -20,7 +20,7 @@ describe('real DeepSeek verified Ralph path', () => {
     const ctx = {
       verifier,
       subagents: {
-        getProvider: () => ({ capabilities: { outputSchema: true }, inheritsParentContext: false }),
+        getProvider: () => ({ capabilities: { outputSchema: true, agentOptions: true }, inheritsParentContext: false }),
         async start() {
           return {
             id: 'real-e2e-local-child',
