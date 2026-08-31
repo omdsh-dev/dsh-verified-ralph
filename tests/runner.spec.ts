@@ -20,7 +20,7 @@ function setup(reports: unknown[], scores: number[], options: { remote?: boolean
     }),
   }
   const subagents = {
-    getProvider: () => ({ name: 'spawn', capabilities: { outputSchema: true }, inheritsParentContext: false }),
+    getProvider: () => ({ name: 'spawn', capabilities: { outputSchema: true, agentOptions: true }, inheritsParentContext: false }),
     async start(_name: string, request: SubagentStartRequest) {
       requests.push(request)
       const report = reports.shift()
@@ -48,6 +48,8 @@ describe('verified Ralph runner', () => {
     expect(result).toMatchObject({ status: 'verified-complete', roundsStarted: 1, agentsStarted: 1 })
     expect(result.verification).toEqual({ completionThreshold: 0.85, finalScore: 0.9, verified: true })
     expect(result.progress[0]).toMatchObject({ childId: 'child-1', decision: 'verified-complete', score: 0.9 })
+    expect(result.budget).toMatchObject({ consumed: { rounds: 1, verifierCalls: 1, verifierTokens: 13, childTokens: 29 }, exhausted: null })
+    expect(test.requests[0]?.agentOptions).toEqual({ maxTokens: 32_768 })
     expect(test.verifier.track).toHaveBeenCalledWith(expect.objectContaining({ checkpointSteps: [1], nEvaluations: 2 }))
     expect(test.disposed()).toBe(1)
   })
@@ -74,6 +76,72 @@ describe('verified Ralph runner', () => {
     expect(budget.status).toBe('budget-limited')
   })
 
+  it('preflights verifier calls and stops on metered verifier tokens', async () => {
+    const calls = setup([], [])
+    const callLimited = await runVerifiedRalph(
+      calls.ctx,
+      resolveConfig({ nEvaluations: 2, maxVerifierCalls: 1 }),
+      { objective: 'Ship it.' },
+      parent,
+      new AbortController().signal,
+    )
+    expect(callLimited).toMatchObject({
+      status: 'verifier-call-budget-limited', roundsStarted: 0, agentsStarted: 0,
+      report: null, verification: { finalScore: null, verified: false },
+      budget: { exhausted: 'verifier-calls' },
+    })
+
+    const tokens = setup([continued], [0.4])
+    const tokenLimited = await runVerifiedRalph(
+      tokens.ctx,
+      resolveConfig({ nEvaluations: 1, maxRounds: 3, maxVerifierTokens: 13 }),
+      { objective: 'Ship it.' },
+      parent,
+      new AbortController().signal,
+    )
+    expect(tokenLimited).toMatchObject({
+      status: 'verifier-token-budget-limited', roundsStarted: 1, agentsStarted: 1,
+      budget: { consumed: { verifierTokens: 13 }, exhausted: 'verifier-tokens' },
+    })
+  })
+
+  it('treats a child output ceiling and wall-clock deadline as explicit budget terminals', async () => {
+    const child = setup([continued], [0.4], { stopReason: 'max-tokens' })
+    const childLimited = await runVerifiedRalph(
+      child.ctx,
+      resolveConfig({ maxChildTokens: 17 }),
+      { objective: 'Ship it.' },
+      parent,
+      new AbortController().signal,
+    )
+    expect(childLimited).toMatchObject({
+      status: 'child-token-budget-limited', roundsStarted: 1, agentsStarted: 1,
+      budget: { limits: { childTokensPerRequest: 17 }, exhausted: 'child-tokens' },
+    })
+    expect(child.requests[0]?.agentOptions).toEqual({ maxTokens: 17 })
+
+    vi.useFakeTimers()
+    try {
+      const ctx = {
+        subagents: {
+          getProvider: () => ({ capabilities: { outputSchema: true, agentOptions: true }, inheritsParentContext: false }),
+          async start(_name: string, request: SubagentStartRequest) {
+            await new Promise((_, reject) => request.signal.addEventListener('abort', () => reject(request.signal.reason), { once: true }))
+            throw new Error('unreachable')
+          },
+        },
+      } as unknown as Context
+      const pending = runVerifiedRalph(ctx, resolveConfig({ maxWallTimeMs: 10 }), { objective: 'Ship it.' }, parent, new AbortController().signal)
+      await vi.advanceTimersByTimeAsync(10)
+      await expect(pending).resolves.toMatchObject({
+        status: 'time-budget-limited', roundsStarted: 1, agentsStarted: 0,
+        budget: { exhausted: 'wall-time' },
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('fails strictly for remote providers, child failure, verifier failure, and cancellation', async () => {
     const remote = setup([complete], [0.9], { remote: true })
     await expect(runVerifiedRalph(remote.ctx, resolveConfig({ maxRounds: 1 }), { objective: 'Ship it.' }, parent, new AbortController().signal)).rejects.toThrow('remote/report-only')
@@ -96,9 +164,11 @@ describe('verified Ralph runner', () => {
   it('rejects bad provider capabilities and caller limits before starting work', async () => {
     const missing = { subagents: { getProvider: () => undefined } } as unknown as Context
     await expect(runVerifiedRalph(missing, resolveConfig({}), { objective: 'Ship it.' }, parent, new AbortController().signal)).rejects.toThrow('not registered')
-    const inherited = { subagents: { getProvider: () => ({ capabilities: { outputSchema: true }, inheritsParentContext: true }) } } as unknown as Context
+    const inherited = { subagents: { getProvider: () => ({ capabilities: { outputSchema: true, agentOptions: true }, inheritsParentContext: true }) } } as unknown as Context
     await expect(runVerifiedRalph(inherited, resolveConfig({}), { objective: 'Ship it.' }, parent, new AbortController().signal)).rejects.toThrow('requires fresh')
     const test = setup([], [])
     await expect(runVerifiedRalph(test.ctx, resolveConfig({ maxRounds: 2 }), { objective: 'Ship it.', maxRounds: 3 }, parent, new AbortController().signal)).rejects.toThrow('exceeds deployment')
+    const noLimits = { subagents: { getProvider: () => ({ capabilities: { outputSchema: true, agentOptions: false }, inheritsParentContext: false }) } } as unknown as Context
+    await expect(runVerifiedRalph(noLimits, resolveConfig({}), { objective: 'Ship it.' }, parent, new AbortController().signal)).rejects.toThrow('child token limits')
   })
 })

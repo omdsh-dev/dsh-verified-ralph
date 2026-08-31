@@ -4,4 +4,6 @@
       name: dsh-verified-ralph
 
 # The provider row is installed separately so deployment controls its backend
-# configuration. No invariant row is needed for this event-free consumer.
+# configuration. Ralph round, verifier, child-token, and wall-time ceilings are
+# resolved by this row's plugin defaults unless a later profile patch supplies
+# stricter deployment values. No invariant row is needed for this event-free consumer.

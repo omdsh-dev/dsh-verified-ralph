@@ -1,6 +1,7 @@
 /** Project immutable local DSH session events into verifier trajectory steps. @module dsh-verified-ralph/projection */
 
 import type { SessionEvent } from '@deepseek-ai/dsh-session'
+import type { VerifiedRalphChildUsage } from './types.ts'
 
 function serialized(value: unknown): string {
   return JSON.stringify(value, null, 2)
@@ -37,4 +38,28 @@ export function projectSessionSteps(events: readonly SessionEvent[]): string[] {
   if (current !== undefined) throw new Error('local child session ended with an open step')
   if (steps.length === 0) throw new Error('local child session contained no completed verifiable steps')
   return steps
+}
+
+/** Sum provider-reported child usage without inferring missing token counters. */
+export function projectChildUsage(events: readonly SessionEvent[]): VerifiedRalphChildUsage {
+  const total = {
+    inputTokens: 0,
+    cacheReadTokens: 0,
+    cacheWriteTokens: 0,
+    outputTokens: 0,
+    reasoningTokens: 0,
+    totalTokens: 0,
+  }
+  for (const event of events) {
+    if (event.type !== 'assistant/message' || event.data.usage === undefined) continue
+    const usage = event.data.usage
+    total.inputTokens += usage.inputTokens
+    total.cacheReadTokens += usage.cacheReadTokens ?? 0
+    total.cacheWriteTokens += usage.cacheWriteTokens ?? 0
+    total.outputTokens += usage.outputTokens
+    total.reasoningTokens += usage.reasoningTokens ?? 0
+    total.totalTokens += usage.totalTokens
+      ?? usage.inputTokens + usage.outputTokens + (usage.cacheReadTokens ?? 0) + (usage.cacheWriteTokens ?? 0)
+  }
+  return total
 }

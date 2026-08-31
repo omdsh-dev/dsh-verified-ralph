@@ -12,6 +12,15 @@ export const usage: VerifierUsage = {
   cacheHitRate: 0.2,
 }
 
+export const childUsage = {
+  inputTokens: 20,
+  cacheReadTokens: 4,
+  cacheWriteTokens: 0,
+  outputTokens: 5,
+  reasoningTokens: 2,
+  totalTokens: 29,
+} as const
+
 export const parent = { id: 'parent', session: { id: 'parent' } } as unknown as Agent
 
 export function sessionEvents(label = 'verified output'): SessionEvent[] {
@@ -20,7 +29,12 @@ export function sessionEvents(label = 'verified output'): SessionEvent[] {
     { type: 'step/start', seq: 1, time: 2, data: { turn: 1, step: 1 } },
     {
       type: 'assistant/message', seq: 2, time: 3, surfaceOp: 'append',
-      data: { turn: 1, step: 1, message: { role: 'assistant', content: [{ type: 'text', text: label }] } },
+      data: {
+        turn: 1,
+        step: 1,
+        message: { role: 'assistant', content: [{ type: 'text', text: label }] },
+        usage: { inputTokens: 20, cacheReadTokens: 4, outputTokens: 5, reasoningTokens: 2, totalTokens: 29 },
+      },
     },
     { type: 'tool/call', seq: 3, time: 4, data: { turn: 1, step: 1, callId: 'call-1', name: 'test', arguments: '{}' } },
     {

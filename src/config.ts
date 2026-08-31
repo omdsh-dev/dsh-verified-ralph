@@ -12,6 +12,10 @@ export interface Config {
   readonly stagnationWindow?: number
   readonly minProgressGain?: number
   readonly correctionGraceRounds?: number
+  readonly maxVerifierCalls?: number
+  readonly maxVerifierTokens?: number
+  readonly maxWallTimeMs?: number
+  readonly maxChildTokens?: number
 }
 
 export interface ResolvedConfig {
@@ -24,6 +28,10 @@ export interface ResolvedConfig {
   readonly stagnationWindow: number
   readonly minProgressGain: number
   readonly correctionGraceRounds: number
+  readonly maxVerifierCalls: number
+  readonly maxVerifierTokens: number
+  readonly maxWallTimeMs: number
+  readonly maxChildTokens: number
 }
 
 export const Config = z.object({
@@ -36,6 +44,10 @@ export const Config = z.object({
   stagnationWindow: z.number().step(1).min(2).default(3),
   minProgressGain: z.number().min(0).max(1).default(0.05),
   correctionGraceRounds: z.number().step(1).min(1).default(2),
+  maxVerifierCalls: z.number().step(1).min(1).default(512),
+  maxVerifierTokens: z.number().step(1).min(1).default(8_388_608),
+  maxWallTimeMs: z.number().step(1).min(1).default(3_600_000),
+  maxChildTokens: z.number().step(1).min(1).default(32_768),
 }) as unknown as z<Config>
 
 function positive(value: number, field: string, minimum = 1): number {
@@ -53,6 +65,8 @@ export function resolveConfig(config: Config): ResolvedConfig {
   if (subagentProvider.length === 0 || subagentProvider !== subagentProvider.trim()) {
     throw new TypeError('subagentProvider must be a non-empty normalized string')
   }
+  const maxWallTimeMs = positive(config.maxWallTimeMs ?? 3_600_000, 'maxWallTimeMs')
+  if (maxWallTimeMs > 2_147_483_647) throw new TypeError('maxWallTimeMs must be <= 2147483647')
   return {
     subagentProvider,
     maxRounds: positive(config.maxRounds ?? 256, 'maxRounds'),
@@ -63,5 +77,9 @@ export function resolveConfig(config: Config): ResolvedConfig {
     stagnationWindow: positive(config.stagnationWindow ?? 3, 'stagnationWindow', 2),
     minProgressGain: probability(config.minProgressGain ?? 0.05, 'minProgressGain'),
     correctionGraceRounds: positive(config.correctionGraceRounds ?? 2, 'correctionGraceRounds'),
+    maxVerifierCalls: positive(config.maxVerifierCalls ?? 512, 'maxVerifierCalls'),
+    maxVerifierTokens: positive(config.maxVerifierTokens ?? 8_388_608, 'maxVerifierTokens'),
+    maxWallTimeMs,
+    maxChildTokens: positive(config.maxChildTokens ?? 32_768, 'maxChildTokens'),
   }
 }
