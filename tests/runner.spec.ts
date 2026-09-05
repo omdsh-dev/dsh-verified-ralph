@@ -9,7 +9,7 @@ const continued = { status: 'continue', summary: 'Working.', evidence: [], nextS
 const complete = { status: 'complete', summary: 'Done.', evidence: ['tests pass'], nextSteps: [], blocker: '' }
 const blocked = { status: 'blocked', summary: 'Blocked.', evidence: [], nextSteps: [], blocker: 'Need credentials.' }
 
-function setup(reports: unknown[], scores: number[], options: { remote?: boolean, stopReason?: string } = {}) {
+function setup(reports: unknown[], scores: number[], options: { remote?: boolean, snapshot?: boolean, stopReason?: string } = {}) {
   const requests: SubagentStartRequest[] = []
   let disposed = 0
   const verifier = {
@@ -25,9 +25,12 @@ function setup(reports: unknown[], scores: number[], options: { remote?: boolean
       requests.push(request)
       const report = reports.shift()
       const id = `child-${requests.length}`
+      const events = sessionEvents(`round ${requests.length}`)
       return {
         id,
-        localAgent: options.remote ? undefined : { id, session: { events: sessionEvents(`round ${requests.length}`) } },
+        localAgent: options.remote
+          ? undefined
+          : { id, session: options.snapshot ? { snapshotEvents: () => events } : { events } },
         result: Promise.resolve({ output: [], structured: report, stopReason: options.stopReason ?? 'completed' }),
         async dispose() { disposed += 1 },
       }
@@ -52,6 +55,13 @@ describe('verified Ralph runner', () => {
     expect(test.requests[0]?.agentOptions).toEqual({ maxTokens: 32_768 })
     expect(test.verifier.track).toHaveBeenCalledWith(expect.objectContaining({ checkpointSteps: [1], nEvaluations: 2 }))
     expect(test.disposed()).toBe(1)
+  })
+
+  it('reads the current immutable Session snapshot API', async () => {
+    const test = setup([complete], [0.9], { snapshot: true })
+    const result = await runVerifiedRalph(test.ctx, resolveConfig({ maxRounds: 1 }), { objective: 'Ship it.' }, parent, new AbortController().signal)
+    expect(result.status).toBe('verified-complete')
+    expect(test.verifier.track).toHaveBeenCalledOnce()
   })
 
   it('rejects completion, sends fixed correction, and stops persistent stagnation', async () => {

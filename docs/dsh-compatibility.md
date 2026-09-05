@@ -1,16 +1,18 @@
 # DSH and verifier compatibility baseline
 
-`dsh-verified-ralph` 0.1.4 was audited against DeepSeek Harness
-`dsh-v0.1.2-alpha.1` at commit
-`cd5ef8148158c3a752a658978873241fdf8e2bbc`, and against
-`dsh-as-a-verifier` 0.2.4 at merge commit
-`d74f80deb2de5b71004c4e81ed7c094eda663de0`.
+`dsh-verified-ralph` 0.2.1 was audited against DeepSeek Harness
+`dsh-v0.1.3-alpha.1` at commit
+`d347e703908d0406b7a7ef80e3a0e594d86b2215`, and against
+`dsh-as-a-verifier` 0.2.6 at merge commit
+`359c41e6f3882c720c1d41f79d4f3ed6cb7d05f5`.
 
 The audit confirms that the one-shot fresh-agent seam still exposes provider
 capabilities, `inheritsParentContext`, structured output, `localAgent`, a
-settling result promise, and explicit disposal. The session projection still
-receives balanced step boundaries plus assistant messages, tool calls, and tool
-results in the shapes consumed by `projectSessionSteps`.
+settling result promise, and explicit disposal. The Session v2 projection still
+receives balanced step boundaries plus durable assistant message settlements,
+tool calls, and tool results in the fields consumed by `projectSessionSteps`.
+Embedded assistant streams and failed attempt settlements remain durable DSH
+evidence but are not duplicated into verifier trajectory text.
 
 The provider remains verifier protocol 1 and advertises offline progress
 tracking. The consumer pins its exact merge commit and its Git-install smoke
@@ -21,10 +23,11 @@ The DSH release still supports Node `^22.19.0 || >=24.0.0` and uses pnpm 11.7.0.
 Node 24 is the primary build, Git-install, and release-check runtime. CI also
 runs the complete suite on the exact minimum Node 22.19.0 on Linux and Windows.
 
-DSH `0.1.2-alpha.1` packages were not available from the npm registry at the
-time of this audit. Development dependencies remain on the latest published
-`0.1.1-rc.2` packages, peer ranges explicitly accept the audited alpha, and a
-read-only source-contract CI job guards the exact DSH release source.
+DSH `0.1.3-alpha.1` packages were not available from the npm registry at the
+time of this audit. Development dependencies and profile/full E2E launchers use
+the latest published `0.1.2-rc.1` packages, peer ranges explicitly accept both
+the installable release and the audited alpha, and a read-only source-contract
+CI job guards the exact DSH release source.
 
 All Harness-facing peers are optional in the package manifest. DSH profiles
 supply them through the runtime module fallback rather than installing a second

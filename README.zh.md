@@ -4,7 +4,7 @@
 
 `dsh-verified-ralph` 是独立的 DeepSeek Harness function plugin，在官方 `ralph` 之外新增 `verified_ralph`。每个 Round 都启动共享工作区上的全新本地 child，将其不可变 DSH session 投影为可观察轨迹，再通过 `ctx.verifier` 独立评分任务完成进展。
 
-插件不修改 DSH core，也不重新定义 verifier API。可复现构建依赖固定到 `dsh-as-a-verifier` merge commit `7dcf417310c8a76cd1e8a5180d964bc9411f92f4`（release `v0.2.5`）；运行时要求 verifier protocol 1 与离线 progress tracking。底层 progress 方法源自 llm-as-a-verifier（<https://github.com/llm-as-a-verifier/llm-as-a-verifier>）的 commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+插件不修改 DSH core，也不重新定义 verifier API。可复现构建依赖固定到 `dsh-as-a-verifier` merge commit `359c41e6f3882c720c1d41f79d4f3ed6cb7d05f5`（release `v0.2.6`）；运行时要求 verifier protocol 1 与离线 progress tracking。底层 progress 方法源自 llm-as-a-verifier（<https://github.com/llm-as-a-verifier/llm-as-a-verifier>）的 commit `8db8a114355a9d7fdf9a8d1d5c87f6aeebd18770`。归属见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 
@@ -26,8 +26,8 @@ dsh plugin --profile web update dsh-as-a-verifier dsh-verified-ralph
 
 ```sh
 dsh plugin --profile web add \
-  github:omdsh-dev/dsh-as-a-verifier#v0.2.5 \
-  github:omdsh-dev/dsh-verified-ralph#v0.2.0
+  github:omdsh-dev/dsh-as-a-verifier#v0.2.6 \
+  github:omdsh-dev/dsh-verified-ralph#v0.2.1
 ```
 
 Headless 使用对应 profile。由于本 Git package 有意固定依赖另一个 Git package，pnpm 11 调用方需要显式允许这条已审计的依赖边和两次 prepare 构建：
@@ -36,7 +36,7 @@ Headless 使用对应 profile。由于本 Git package 有意固定依赖另一�
 blockExoticSubdeps: false
 allowBuilds:
   dsh-verified-ralph@https://codeload.github.com/omdsh-dev/dsh-verified-ralph/tar.gz/<verified-ralph-commit>: true
-  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/7dcf417310c8a76cd1e8a5180d964bc9411f92f4: true
+  dsh-as-a-verifier@https://codeload.github.com/omdsh-dev/dsh-as-a-verifier/tar.gz/359c41e6f3882c720c1d41f79d4f3ed6cb7d05f5: true
 ```
 
 将 `<verified-ralph-commit>` 替换为实际安装的 commit；跟随更新后的默认分支时，始终复制 pnpm 当前打印的精确 key。Release tag 只从验证完成的 `main` merge 创建且绝不移动；兼容修复提升 patch，公共编排能力提升 minor，不兼容的 verifier protocol 要求提升 major。bundle 只插入 `dsh-verified-ralph`；verifier row 与凭据由部署单独管理。
@@ -104,7 +104,7 @@ pnpm run build
 pnpm run prepare
 ```
 
-所有 PR 与 `main` push 都会在 Ubuntu/Windows 上以 Node 24 和精确最低版本 Node 22.19.0 运行完整矩阵，并以 Node 24 执行精确 commit Git-install 与真实 Web/Headless Profile 安装 smoke。Profile smoke 将两个插件安装进已发布 DSH CLI，检查 peers、官方 `ralph` 与 `verified_ralph` 共存，并让两个 surface 通过 help 路径干净退出。源码合同门禁固定到已审查的 DSH `dsh-v0.1.2-alpha.2`（`0a53fb55bea101816fa226bb964ae2bed71c343b`），验证 one-shot subagent、child token limit、usage 与 SessionEvent seam；CI 保持无密钥。
+所有 PR 与 `main` push 都会在 Ubuntu/Windows 上以 Node 24 和精确最低版本 Node 22.19.0 运行完整矩阵，并以 Node 24 执行精确 commit Git-install 与真实 Web/Headless Profile 安装 smoke。Profile smoke 将两个插件安装进 npm 当前最新的 DSH CLI（`0.1.2-rc.1`），检查 peers、官方 `ralph` 与 `verified_ralph` 共存，并让两个 surface 通过 help 路径干净退出。独立的源码合同门禁固定到已审查的 DSH `dsh-v0.1.3-alpha.1`（`d347e703908d0406b7a7ef80e3a0e594d86b2215`），验证 one-shot subagent、child token limit、usage 与 Session v2 seam；由于该 alpha 尚未发布到 npm，这两个验证目标有意分开维护。CI 保持无密钥。
 
 带凭据的发布门禁为 `pnpm run test:e2e:full -- --ref <exact-consumer-sha> --evidence <output.json>`。它把精确 Git commit 安装进临时 Headless Profile，并执行完整 parent → `verified_ralph` → 真实 `spawn` child → 共享工作区 → durable SessionEvent → DeepSeek verifier → policy 链路。evidence 使用 `dsh-verified-ralph-release-evidence/v1`，仅包含精确组件身份、endpoint 类型、模型、usage 计数、终止状态、分数、预算原因、运行环境和耗时；绝不包含 API key、objective、prompt、report、轨迹、工具参数/结果、run id 或 child id。
 

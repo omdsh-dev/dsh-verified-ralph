@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
-const EXPECTED_COMMIT = '0a53fb55bea101816fa226bb964ae2bed71c343b'
-const EXPECTED_VERSION = '0.1.2-alpha.2'
+const EXPECTED_COMMIT = 'd347e703908d0406b7a7ef80e3a0e594d86b2215'
+const EXPECTED_VERSION = '0.1.3-alpha.1'
 const source = process.env.DSH_SOURCE_DIR
 if (!source) throw new Error('DSH_SOURCE_DIR must point to the checked-out deepseek-harness release')
 
@@ -33,9 +33,11 @@ const session = await text('packages/core/session/src/types.ts')
 for (const event of ["'step/start'", "'assistant/message'", "'tool/call'", "'tool/result'", "'step/end'"]) {
   assert.match(session, new RegExp(event), `session trajectory event ${event} is missing`)
 }
-assert.match(session, /'assistant\/message': \{ turn: number; step: number; message: AssistantMessage;/, 'assistant message projection shape changed')
+assert.match(session, /'assistant\/message': \{[\s\S]*message: AssistantMessage[\s\S]*stream: AssistantStreamRecord\[\][\s\S]*usage\?: TokenUsage/, 'assistant message projection shape changed')
 assert.match(session, /'tool\/call': \{ turn: number; step: number; callId: ToolCallId; name: string; arguments: string \}/, 'tool call projection shape changed')
-assert.match(session, /'assistant\/message': \{ turn: number; step: number; message: AssistantMessage; usage\?: TokenUsage;/, 'child usage projection shape changed')
+assert.match(session, /export const SESSION_FORMAT_VERSION = 2/, 'expected audited DSH Session format v2')
+const sessionRuntime = await text('packages/core/session/src/index.ts')
+assert.match(sessionRuntime, /snapshotEvents\(/, 'immutable Session snapshot API changed')
 
 const agentTypes = await text('packages/core/agent/src/runtime-types.ts')
 assert.match(agentTypes, /maxTokens\?: number/, 'per-child output-token ceiling changed')

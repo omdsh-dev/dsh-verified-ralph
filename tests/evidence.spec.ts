@@ -32,9 +32,9 @@ describe('release evidence', () => {
   it('keeps only allowlisted identities, counters, status, and timing', () => {
     const evidence = createReleaseEvidence(result, {
       generatedAt: '2026-08-31T00:00:00.000Z',
-      deepseekHarness: { version: '0.1.2-alpha.2', commit: sha },
-      provider: { version: '0.2.5', commit: sha },
-      consumer: { version: '0.2.0', commit: sha },
+      deepseekHarness: { version: '0.1.2-rc.1', commit: sha },
+      provider: { version: '0.2.6', commit: sha },
+      consumer: { version: '0.2.1', commit: sha },
       endpoint: 'official',
       model: 'deepseek-v4-flash',
       elapsedMs: 1234,
@@ -53,9 +53,9 @@ describe('release evidence', () => {
 
   it('rejects mutable refs and malformed timing', () => {
     expect(() => createReleaseEvidence(result, {
-      deepseekHarness: { version: '0.1.2-alpha.2', commit: 'main' },
-      provider: { version: '0.2.5', commit: sha },
-      consumer: { version: '0.2.0', commit: sha },
+      deepseekHarness: { version: '0.1.2-rc.1', commit: 'main' },
+      provider: { version: '0.2.6', commit: sha },
+      consumer: { version: '0.2.1', commit: sha },
       endpoint: 'official', model: 'deepseek-v4-flash', elapsedMs: -1,
       runtime: { node: 'v24', platform: 'linux', arch: 'x64' },
     })).toThrow()

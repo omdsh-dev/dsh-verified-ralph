@@ -4,12 +4,12 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
-const DSH_VERSION = '0.1.2-alpha.2'
+const DSH_VERSION = '0.1.2-rc.1'
 const CONSUMER_NAME = 'dsh-verified-ralph'
 const CONSUMER_REPOSITORY = 'omdsh-dev/dsh-verified-ralph'
 const PROVIDER_NAME = 'dsh-as-a-verifier'
 const PROVIDER_REPOSITORY = 'omdsh-dev/dsh-as-a-verifier'
-const PROVIDER_COMMIT = '7dcf417310c8a76cd1e8a5180d964bc9411f92f4'
+const PROVIDER_COMMIT = '359c41e6f3882c720c1d41f79d4f3ed6cb7d05f5'
 
 function argument(name) {
   const index = process.argv.indexOf(name)
@@ -58,7 +58,7 @@ try {
     'allowBuilds:',
     `  '@deepseek-ai/dsh-subprocess-local@${DSH_VERSION}': true`,
     "  '@google/genai@1.52.0': true",
-    "  'koffi@3.1.6': true",
+    "  'koffi@3.2.0': true",
     "  'node-pty@1.2.0-beta.15': true",
     "  'protobufjs@7.6.6': true",
     '',
