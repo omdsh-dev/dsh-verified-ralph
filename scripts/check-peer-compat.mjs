@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import semver from 'semver'
 
-const CURRENT_DSH_RELEASE = '0.1.2-alpha.2'
+const CURRENT_DSH_RELEASE = '0.1.3-alpha.1'
 const MINIMUM_DSH_RELEASE = '0.1.2-alpha.2'
 const DSH_PEERS = [
   '@deepseek-ai/dsh-agent',

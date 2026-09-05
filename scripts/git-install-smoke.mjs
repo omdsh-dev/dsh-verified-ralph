@@ -9,7 +9,7 @@ const PACKAGE_NAME = 'dsh-verified-ralph'
 const REPOSITORY = 'omdsh-dev/dsh-verified-ralph'
 const PROVIDER_NAME = 'dsh-as-a-verifier'
 const PROVIDER_REPOSITORY = 'omdsh-dev/dsh-as-a-verifier'
-const PROVIDER_COMMIT = '7dcf417310c8a76cd1e8a5180d964bc9411f92f4'
+const PROVIDER_COMMIT = '359c41e6f3882c720c1d41f79d4f3ed6cb7d05f5'
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 
 function argument(name) {
@@ -96,7 +96,7 @@ try {
   const providerEntry = consumerRequire.resolve(PROVIDER_NAME)
   const providerRoot = dirname(dirname(providerEntry))
   const providerManifest = JSON.parse(readFileSync(join(providerRoot, 'package.json'), 'utf8'))
-  if (providerManifest.version !== '0.2.5') throw new Error(`installed provider version ${providerManifest.version} is not 0.2.5`)
+  if (providerManifest.version !== '0.2.6') throw new Error(`installed provider version ${providerManifest.version} is not 0.2.6`)
   const provider = await import(`${pathToFileURL(providerEntry).href}?smoke=${Date.now()}`)
   if (provider.VERIFIER_PROTOCOL_VERSION !== 1) throw new Error('installed provider does not publish verifier protocol 1')
   if (provider.VERIFIER_CAPABILITIES?.offlineProgressTracking !== true) {

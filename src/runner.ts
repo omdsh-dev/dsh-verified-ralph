@@ -3,6 +3,7 @@
 import { randomUUID } from 'node:crypto'
 import type { Context } from '@deepseek-ai/cordis'
 import type { Agent } from '@deepseek-ai/dsh-agent'
+import type { SessionEvent } from '@deepseek-ai/dsh-session'
 import type { VerifierUsage } from 'dsh-as-a-verifier'
 import type { ResolvedConfig } from './config.ts'
 import { decidePolicy, type CorrectionState } from './policy.ts'
@@ -26,6 +27,14 @@ export interface VerifiedRalphArgs {
   readonly maxVerifierTokens?: number
   readonly maxWallTimeMs?: number
   readonly maxChildTokens?: number
+}
+
+type CompatibleSession = Agent['session'] & { readonly events?: readonly SessionEvent[] }
+
+function snapshotSessionEvents(session: CompatibleSession): readonly SessionEvent[] {
+  if (typeof session.snapshotEvents === 'function') return session.snapshotEvents()
+  if (session.events !== undefined) return session.events
+  throw new Error('local child session exposes neither snapshotEvents() nor legacy immutable events')
 }
 
 function resolveCeiling(value: number | undefined, ceiling: number, field: string): number {
@@ -214,8 +223,9 @@ export async function runVerifiedRalph(
           throw new Error(`verified Ralph round ${round} child ended with ${childResult.stopReason}${detail}`)
         }
         const report = readReport(childResult.structured, config.maxHandoffChars)
-        const steps = projectSessionSteps(run.localAgent.session.events)
-        const childUsage = projectChildUsage(run.localAgent.session.events)
+        const events = snapshotSessionEvents(run.localAgent.session)
+        const steps = projectSessionSteps(events)
+        const childUsage = projectChildUsage(events)
         const tracked = await ctx.verifier.track({
           problem: objective,
           steps,
